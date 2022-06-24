@@ -23,8 +23,8 @@ public class NoDurabilityPlus : Mod
         }
     }
 
-    static string KEY_HOTSLOT = "PlayerInventory"; //If changed, modify the json entry as well
-    static string HARMONY_ID = "us.barpidone.raftmods.nodurabilityplus";
+    private const string KEY_HOTSLOT = "PlayerInventory"; //If changed, modify the json entry as well
+    private const string HARMONY_ID = "us.barpidone.raftmods.nodurabilityplus";
 
     Harmony harmony;    
 
