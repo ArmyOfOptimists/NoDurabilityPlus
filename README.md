@@ -1,3 +1,7 @@
+v1.1.1
+- Settings are now changeable in-game in addition to the main menu
+- minor cleanup of code
+
 v1.0.1
 - minor cleanup of internal strings
 
