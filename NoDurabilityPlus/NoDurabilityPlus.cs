@@ -17,14 +17,14 @@ public class NoDurabilityPlus : Mod
         {
             if(_slotModifiers == null || _slotModifiers.Count == 0)
             {
-                _slotModifiers = loadSlotModifiers();
+                _slotModifiers = initializeSlotModifiers();
             }
             return _slotModifiers;
         }
     }
 
-    static string KEY_HOTSLOT = "PlayerInventory"; //If changed, modify the json entry as well
-    static string HARMONY_ID = "us.barpidone.raftmods.nodurabilityplus";
+    private const string KEY_HOTSLOT = "PlayerInventory"; //If changed, modify the json entry as well
+    private const string HARMONY_ID = "us.barpidone.raftmods.nodurabilityplus";
 
     Harmony harmony;    
 
@@ -49,7 +49,7 @@ public class NoDurabilityPlus : Mod
             && slot.itemInstance.settings_equipment.EquipType != EquipSlotType.None;
     }
 
-    public static Dictionary<string,int> loadSlotModifiers()
+    public static Dictionary<string,int> initializeSlotModifiers()
     {
         Dictionary<string, int> ret = new Dictionary<string, int>();
         try
@@ -93,7 +93,6 @@ public class NoDurabilityPlus : Mod
         if (modifier > 0)
             return doCache(instance, modifier);
         else
-
             return true;
     }
 
@@ -145,7 +144,7 @@ public class NoDurabilityPlus : Mod
     public void ExtraSettingsAPI_Load()
     {
         ES_API_SetValues();
-    }    
+    }
 
     public void ExtraSettingsAPI_SettingsOpen()
     {
