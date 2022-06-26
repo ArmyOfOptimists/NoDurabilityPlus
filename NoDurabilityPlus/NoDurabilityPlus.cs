@@ -22,9 +22,13 @@ public class NoDurabilityPlus : Mod
             return _slotModifiers;
         }
     }
-
-    private const string KEY_HOTSLOT = "PlayerInventory"; //If changed, modify the json entry as well
+    static bool useExperimental = false;
+    static string[] itemBlacklist = { "bucket" };  //Item names more readable.  Maybe refactor into IDs later.
     private const string HARMONY_ID = "us.barpidone.raftmods.nodurabilityplus";
+
+    //If following changed, modify the json entry as well
+    private const string KEY_WIDE_ANTI_DUPE = "WideAntiDuplication"; 
+    private const string KEY_HOTSLOT = "PlayerInventory"; 
 
     Harmony harmony;    
 
@@ -42,6 +46,12 @@ public class NoDurabilityPlus : Mod
     {
         SlotModifiers[type] = value;
         Log(string.Format( "Type: {0}, Modifier: {1}", type, SlotModifiers[type]));
+    }
+
+    public static void setExperimentalMode(bool value)
+    {
+        useExperimental = value;
+        Log("Experimental mode: " + value);
     }
 
     public static bool slotShouldBeAffected(Slot slot) {
@@ -74,9 +84,34 @@ public class NoDurabilityPlus : Mod
         return ret;
     }
 
-    /**
-     * returns true if durability loss has to be prevented
-     */
+    public static bool isBlacklisted(Slot instance)
+    {
+        if(useExperimental)
+            return (instance.itemInstance.BaseItemMaxUses <= 1);
+
+        string itemName = instance.itemInstance.settings_Inventory.DisplayName.ToLower();
+        for (int i = 0; i < itemBlacklist.Length; ++i)
+        {
+            if (itemBlacklist[i] == itemName)
+                return true;
+        }
+        return false;
+    }
+
+    public static bool isBlacklisted(PlayerInventory instance)
+    {
+        if(useExperimental)
+            return (instance.GetSelectedHotbarItem().BaseItemMaxUses <= 1);
+
+        string itemName = instance.GetSelectedHotbarItem().settings_Inventory.DisplayName.ToLower();
+        for (int i = 0; i < itemBlacklist.Length; ++i)
+        {
+            if (itemBlacklist[i] == itemName)
+                return true;
+        }
+        return false;
+    }
+
     public static bool ModifyLoss(Slot instance)
     {
         string slotName = instance.itemInstance.settings_equipment.EquipType.ToString();
@@ -88,7 +123,7 @@ public class NoDurabilityPlus : Mod
     }
 
     public static bool ModifyLoss(PlayerInventory instance)
-    {
+    {        
         int modifier = SlotModifiers[KEY_HOTSLOT];
         if (modifier > 0)
             return doCache(instance, modifier);
@@ -125,14 +160,14 @@ public class NoDurabilityPlus : Mod
         modInfo = modlistEntry.jsonmodinfo;   
         harmony = new Harmony(HARMONY_ID);
         harmony.PatchAll(Assembly.GetExecutingAssembly());
-        Log("loaded :) [v"+ modInfo.version +"]");
+        Log("loaded [v"+ modInfo.version +"].");
     }
 
     public void OnModUnload()
     {
         harmony.UnpatchAll(HARMONY_ID);
         Destroy(gameObject);
-        Log("unloaded :(");
+        Log("unloaded.");
     }
 
     /*******************************
@@ -146,17 +181,32 @@ public class NoDurabilityPlus : Mod
         ES_API_SetValues();
     }
 
+
     public void ExtraSettingsAPI_SettingsOpen()
     {
         foreach (var sm in SlotModifiers)
         {
             ExtraSettingsAPI_SetComboboxSelectedIndex(sm.Key, sm.Value);            
         }
+        ExtraSettingsAPI_SetCheckboxState(KEY_WIDE_ANTI_DUPE, useExperimental);
     }
 
     public void ExtraSettingsAPI_SettingsClose()
     {
         ES_API_SetValues();
+    }
+
+    public void ExtraSettingsAPI_SetCheckboxState(string SettingName, bool value)
+    {
+        if(ExtraSettingsAPI_Loaded)
+            ExtraSettingsAPI_Traverse.Method("setCheckboxState", new object[] { this, SettingName, value }).GetValue<bool>();
+    }
+
+    public bool ExtraSettingsAPI_GetCheckboxState(string SettingName)
+    {
+        if(ExtraSettingsAPI_Loaded)
+            return ExtraSettingsAPI_Traverse.Method("getCheckboxState", new object[] { this, SettingName }).GetValue<bool>();
+        return false;
     }
 
     public void ExtraSettingsAPI_SetComboboxSelectedIndex(string SettingName, int value)
@@ -179,6 +229,7 @@ public class NoDurabilityPlus : Mod
         {
             setModifier(k, ExtraSettingsAPI_GetComboboxSelectedIndex(k));
         }
+       setExperimentalMode(ExtraSettingsAPI_GetCheckboxState(KEY_WIDE_ANTI_DUPE));
     }
 
     /********************
@@ -190,7 +241,7 @@ public class NoDurabilityPlus : Mod
         [HarmonyPrefix]
         static void Prefix(ref Slot __instance, ref int amountOfUsesToAdd)
         {
-            if (slotShouldBeAffected(__instance)){
+            if (slotShouldBeAffected(__instance) && !isBlacklisted(__instance)){
                 if (amountOfUsesToAdd < 0 && ModifyLoss(__instance)){
                     amountOfUsesToAdd = 0;
                 }
@@ -204,7 +255,7 @@ public class NoDurabilityPlus : Mod
         [HarmonyPrefix]
         static void Prefix(ref PlayerInventory __instance, ref int durabilityStacksToRemove)
         {
-            if (durabilityStacksToRemove > 0 && ModifyLoss(__instance)){
+            if (durabilityStacksToRemove > 0 && !isBlacklisted(__instance) && ModifyLoss(__instance)){
                 durabilityStacksToRemove = 0;
             }
         }
