@@ -1,3 +1,6 @@
+v1.1.2
+- updated version string to match site and fix versioning issue
+
 v1.1.1
 - Settings are now changeable in-game in addition to the main menu
 - minor cleanup of code
