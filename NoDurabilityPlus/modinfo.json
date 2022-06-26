@@ -2,7 +2,7 @@
   "name": "No Durability Plus",
   "author": "ArmyOfOptimists",
   "description": "Allows modification of durability by slot and item type.  Requires ExtraSettingsAPI to configure, otherwise all items will have infinite durability.  Based on the original 'Almost No Durability' mod by Aidanamite.",
-  "version": "v1.1.2",
+  "version": "v1.2.0",
   "license": "GNU AGPLv3",
   "icon": "icon.png",
   "banner": "banner.jpg",
@@ -125,6 +125,18 @@
         "8x",
         "9x"
       ]
+    },
+    {
+      "name": "WideAntiDuplication",
+      "text": "Wide Anti-Duplication",
+      "type": "checkbox",
+      "access": "both",
+      "default": "false"
+    },
+    {
+      "name": "WADText",
+      "text": "Changes how anti-duplication works.  Use if some items still duplicate.",
+      "type": "text"
     }
   ]
 }
