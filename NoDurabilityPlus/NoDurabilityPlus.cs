@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using HMLLibrary;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -9,6 +10,51 @@ using System.Collections.Generic;
 public class NoDurabilityPlus : Mod
 {
     static JsonModInfo modInfo;
+
+    //Adds compatibility for Augmented Equipment
+    static Dictionary<string, EquipSlotType> EquipSlotDictionary = new Dictionary<string, EquipSlotType>
+    {
+        ["None"] = (EquipSlotType)0,
+        ["Feet"] = (EquipSlotType)1,
+        ["Head"] = (EquipSlotType)2,
+        ["Light"] = (EquipSlotType)3,
+        ["Chest"] = (EquipSlotType)4,
+        ["Backpack"] = (EquipSlotType)6,
+        ["ZiplineTool"] = (EquipSlotType)7,
+        ["OxygenBottle"] = (EquipSlotType)8,
+        ["Belt"] = (EquipSlotType)9,
+        ["SwimFeet"] = (EquipSlotType)10,
+        ["Glove"] = (EquipSlotType)11
+
+    };
+
+    static Dictionary<string, string> EquipNameSlotDictionary = new Dictionary<string, string>
+    {
+        {"0","None"},
+        {"1","Feet"},
+        {"2","Head"},
+        {"3","Light"},
+        {"4","Chest"},
+        {"6","Backpack"},
+        {"7","ZiplineTool"},
+        {"8","OxygenBottle"},
+        {"9","Belt"},
+        {"10","SwimFeet"},
+        {"11","Glove"}
+    };
+
+  public static EquipSlotType Get(string equipmentType) {
+    return EquipSlotDictionary[equipmentType];
+  }
+
+  public static string GetName(string equipmentname) {
+    return EquipNameSlotDictionary[equipmentname];
+  }
+
+
+
+
+
     static Dictionary<int, int> counterCache = new Dictionary<int, int>();
     static Dictionary<string, int> _slotModifiers;
     static Dictionary<string, int> SlotModifiers
@@ -73,13 +119,26 @@ public class NoDurabilityPlus : Mod
                     Debug.Log("Added '" + slotName + "' to modifier list.");
                 }
             }
+            if (Harmony.HasAnyPatches("com.bahamut.augmentedequipment"))
+            {
+                Debug.Log("[NoDurabilityPlus]: AugmentedEquipment is installed! Enabling compatibility mode.");
+                string[] AugmentedEquipmentSlotTypes = new string[3] {"Light", "SwimFeet", "Glove"};
+                foreach(string slotName in AugmentedEquipmentSlotTypes)
+                {
+                    ret[slotName] = 0;
+                    Debug.Log("Added '" + slotName + "' to modifier list.");
+                }
+            }
             ret["PlayerInventory"] = 0;
             Debug.Log("Added '" + KEY_HOTSLOT + "' to modifier list.");
         }
         catch (Exception e)
         {
             Log("Exception: " + e.Message);
-            Debug.LogException(e);
+            if (!Harmony.HasAnyPatches("com.bahamut.augmentedequipment"))
+            {
+                Debug.LogException(e);
+            }
         }
         return ret;
     }
@@ -114,7 +173,16 @@ public class NoDurabilityPlus : Mod
 
     public static bool ModifyLoss(Slot instance)
     {
+        string itemName = instance.itemInstance.settings_Inventory.DisplayName.ToLower();
         string slotName = instance.itemInstance.settings_equipment.EquipType.ToString();
+        if(EquipNameSlotDictionary.ContainsKey(slotName))
+        {
+            slotName = GetName(slotName);
+        }
+        if(slotName == "Belt")
+        {
+            return true;
+        }
         int modifier = SlotModifiers[slotName];
         if (modifier > 0)
             return doCache(instance, modifier);
@@ -230,6 +298,18 @@ public class NoDurabilityPlus : Mod
             setModifier(k, ExtraSettingsAPI_GetComboboxSelectedIndex(k));
         }
        setExperimentalMode(ExtraSettingsAPI_GetCheckboxState(KEY_WIDE_ANTI_DUPE));
+    }
+
+    public bool ExtraSettingsAPI_HandleSettingVisible(string SettingName) 
+    {
+        if (Harmony.HasAnyPatches("com.bahamut.augmentedequipment"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /********************

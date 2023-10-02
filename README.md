@@ -1,3 +1,6 @@
+v1.2.1
+- Added compatibility with the Augmented Equipment mod
+
 v1.1.2
 - updated version string to match site and fix versioning issue
 
