@@ -135,10 +135,7 @@ public class NoDurabilityPlus : Mod
         catch (Exception e)
         {
             Log("Exception: " + e.Message);
-            if (!Harmony.HasAnyPatches("com.bahamut.augmentedequipment"))
-            {
-                Debug.LogException(e);
-            }
+            Debug.LogException(e);
         }
         return ret;
     }
