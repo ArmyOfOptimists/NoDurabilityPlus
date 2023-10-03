@@ -311,19 +311,19 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Raft\Raft_Data/Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="0Harmony.dll">
-      <HintPath>C:\Users\barpi\AppData\Roaming\RaftModLoader\binaries\0Harmony.dll</HintPath>
+      <HintPath>C:\Users\nicho\AppData\Roaming\RaftModLoader\binaries\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="coremod.dll">
-      <HintPath>C:\Users\barpi\AppData\Roaming\RaftModLoader\binaries\coremod.dll</HintPath>
+      <HintPath>C:\Users\nicho\AppData\Roaming\RaftModLoader\binaries\coremod.dll</HintPath>
     </Reference>
     <Reference Include="HMLCoreLibrary.dll">
-      <HintPath>C:\Users\barpi\AppData\Roaming\RaftModLoader\binaries\HMLCoreLibrary.dll</HintPath>
+      <HintPath>C:\Users\nicho\AppData\Roaming\RaftModLoader\binaries\HMLCoreLibrary.dll</HintPath>
     </Reference>
     <Reference Include="SharpZipLib.dll">
-      <HintPath>C:\Users\barpi\AppData\Roaming\RaftModLoader\binaries\SharpZipLib.dll</HintPath>
+      <HintPath>C:\Users\nicho\AppData\Roaming\RaftModLoader\binaries\SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple.dll">
-      <HintPath>C:\Users\barpi\AppData\Roaming\RaftModLoader\binaries\System.ValueTuple.dll</HintPath>
+      <HintPath>C:\Users\nicho\AppData\Roaming\RaftModLoader\binaries\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup>
